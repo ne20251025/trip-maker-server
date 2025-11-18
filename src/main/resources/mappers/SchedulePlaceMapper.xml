@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.SchedulePlaceMapper">
+
+    <insert id="insertSchedulePlace" parameterType="com.example.trip_maker_server.domain.SchedulePlace">
+        INSERT INTO T_SCHEDULE_PLACE (
+            DAY_ID, PLACE_NAME, PLACE_ORDER, COST, MEMO, LATITUDE, LONGITUDE
+        ) VALUES (
+            #{dayId}, #{placeName}, #{placeOrder}, #{cost}, #{memo}, #{latitude}, #{longitude}
+        )
+    </insert>
+    
+    <select id="selectPlacesByDayIds" parameterType="java.util.List" resultType="com.example.trip_maker_server.vo.SchedulePlaceDetailVO">
+        SELECT
+            PLACE_ID,
+            DAY_ID,
+            PLACE_NAME,
+            PLACE_ORDER,
+            COST,
+            MEMO,
+            LATITUDE,
+            LONGITUDE
+        FROM
+            T_SCHEDULE_PLACE
+        WHERE
+            DAY_ID IN
+            <foreach item="dayId" collection="list" open="(" separator="," close=")">
+                #{dayId}
+            </foreach>
+        ORDER BY
+            PLACE_ORDER ASC
+    </select>
+    
+    <delete id="deletePlacesByScheduleId" parameterType="int">
+        DELETE P 
+        FROM T_SCHEDULE_PLACE P
+        JOIN T_SCHEDULE_DAY D ON P.DAY_ID = D.DAY_ID
+        WHERE D.SCHEDULE_ID = #{scheduleId}
+    </delete>
+
+</mapper>

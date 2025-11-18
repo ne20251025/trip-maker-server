@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.ScheduleInfoMapper">
+
+    <insert id="insertScheduleInfo" parameterType="com.example.trip_maker_server.domain.ScheduleInfo"
+            useGeneratedKeys="true" keyProperty="scheduleId">
+        INSERT INTO T_SCHEDULE_INFO (
+            USER_ID, TITLE, START_DATE, END_DATE, TOTAL_BUDGET, REG_DATE, UPDATE_DATE
+        ) VALUES (
+            #{userId}, #{title}, #{startDate}, #{endDate}, #{totalBudget}, NOW(), NOW()
+        )
+    </insert>
+    
+    <update id="updateScheduleInfo" parameterType="com.example.trip_maker_server.domain.ScheduleInfo">
+        UPDATE T_SCHEDULE_INFO
+        SET 
+            TITLE = #{title},
+            START_DATE = #{startDate},
+            END_DATE = #{endDate},
+            TOTAL_BUDGET = #{totalBudget},
+            UPDATE_DATE = NOW()
+        WHERE 
+            SCHEDULE_ID = #{scheduleId}
+    </update>
+    
+    <delete id="deleteScheduleById" parameterType="int">
+        DELETE FROM T_SCHEDULE_INFO
+        WHERE SCHEDULE_ID = #{scheduleId}
+    </delete>
+    
+    <select id="selectSchedulesByUserId" parameterType="int" resultType="com.example.trip_maker_server.domain.ScheduleInfo">
+        SELECT 
+            SCHEDULE_ID, 
+            USER_ID, 
+            TITLE, 
+            START_DATE, 
+            END_DATE, 
+            TOTAL_BUDGET, 
+            REG_DATE
+        FROM 
+            T_SCHEDULE_INFO
+        WHERE 
+            USER_ID = #{userId}
+        ORDER BY 
+            REG_DATE DESC
+    </select>
+    
+    <select id="selectScheduleAndUserById" parameterType="int" resultType="com.example.trip_maker_server.vo.ScheduleDetailVO">
+        SELECT 
+            S.SCHEDULE_ID,
+            S.TITLE,
+            S.START_DATE,
+            S.END_DATE,
+            S.TOTAL_BUDGET,
+            U.USER_ID,
+            U.NICKNAME,
+            U.PROFILE_IMAGE_URL
+        FROM 
+            T_SCHEDULE_INFO S
+        LEFT JOIN 
+            T_USER_INFO U ON S.USER_ID = U.USER_ID
+        WHERE 
+            S.SCHEDULE_ID = #{scheduleId}
+    </select>
+
+</mapper>

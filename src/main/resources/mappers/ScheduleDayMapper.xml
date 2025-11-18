@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.ScheduleDayMapper">
+
+    <insert id="insertScheduleDay" parameterType="com.example.trip_maker_server.domain.ScheduleDay"
+            useGeneratedKeys="true" keyProperty="dayId">
+        INSERT INTO T_SCHEDULE_DAY (
+            SCHEDULE_ID, DAY_NUMBER
+        ) VALUES (
+            #{scheduleId}, #{dayNumber}
+        )
+    </insert>
+    
+    <select id="selectDaysByScheduleId" parameterType="int" resultType="com.example.trip_maker_server.vo.ScheduleDayDetailVO">
+        SELECT
+            DAY_ID,
+            DAY_NUMBER
+        FROM
+            T_SCHEDULE_DAY
+        WHERE
+            SCHEDULE_ID = #{scheduleId}
+        ORDER BY
+            DAY_NUMBER ASC
+    </select>
+    
+    <delete id="deleteDaysByScheduleId" parameterType="int">
+        DELETE FROM T_SCHEDULE_DAY
+        WHERE SCHEDULE_ID = #{scheduleId}
+    </delete>
+
+</mapper>

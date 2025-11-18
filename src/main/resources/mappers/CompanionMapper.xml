@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.CompanionMapper">
+
+    <select id="selectAllPosts" parameterType="com.example.trip_maker_server.vo.CompanionSearchDTO" resultType="com.example.trip_maker_server.vo.CompanionPostVO">
+        SELECT 
+            P.POST_ID, P.USER_ID, U.NICKNAME,
+            P.TITLE, P.CONTENT, P.TAGS, P.STATUS, P.REG_DATE
+        FROM 
+            T_COMPANION_POST P
+        LEFT JOIN 
+            T_USER_INFO U ON P.USER_ID = U.USER_ID
+        <where>
+            <if test="tagList != null and tagList.size() > 0">
+                AND (
+                    <foreach collection="tagList" item="tag" separator="AND">
+                        P.TAGS LIKE CONCAT('%', #{tag}, '%')
+                    </foreach>
+                )
+            </if>
+
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    <choose>
+                        <when test="searchType == 'title'">
+                            P.TITLE LIKE CONCAT('%', #{keyword}, '%')
+                        </when>
+                        <when test="searchType == 'content'">
+                            P.CONTENT LIKE CONCAT('%', #{keyword}, '%')
+                        </when>
+                        <otherwise>
+                            P.TITLE LIKE CONCAT('%', #{keyword}, '%') 
+                            OR P.CONTENT LIKE CONCAT('%', #{keyword}, '%')
+                        </otherwise>
+                    </choose>
+                )
+            </if>
+        </where>
+        ORDER BY 
+            P.POST_ID DESC
+    </select>
+
+	<insert id="insertPost" parameterType="com.example.trip_maker_server.vo.CompanionPostVO">
+        INSERT INTO T_COMPANION_POST (
+            USER_ID, 
+            SCHEDULE_ID, 
+            TITLE, 
+            CONTENT, 
+            TAGS, 
+            STATUS
+        ) VALUES (
+            #{userId}, 
+            #{scheduleId}, 
+            #{title}, 
+            #{content}, 
+            #{tags}, 
+            'OPEN'
+        )
+    </insert>
+    
+    <select id="selectPostById" parameterType="int" resultType="com.example.trip_maker_server.vo.CompanionPostVO">
+        SELECT 
+            P.POST_ID, P.USER_ID, 
+            U.NICKNAME, U.PROFILE_IMAGE_URL, -- (★) 여기 추가
+            P.TITLE, P.CONTENT, P.TAGS, P.STATUS, P.REG_DATE,
+            P.SCHEDULE_ID,
+            S.TITLE AS SCHEDULE_TITLE,
+            CONCAT(DATE_FORMAT(S.START_DATE, '%Y.%m.%d'), ' ~ ', DATE_FORMAT(S.END_DATE, '%Y.%m.%d')) AS SCHEDULE_PERIOD
+        FROM T_COMPANION_POST P
+        LEFT JOIN T_USER_INFO U ON P.USER_ID = U.USER_ID
+        LEFT JOIN T_SCHEDULE_INFO S ON P.SCHEDULE_ID = S.SCHEDULE_ID
+        WHERE P.POST_ID = #{postId}
+    </select>
+
+    <delete id="deletePost" parameterType="int">
+        DELETE FROM T_COMPANION_POST WHERE POST_ID = #{postId}
+    </delete>
+</mapper>

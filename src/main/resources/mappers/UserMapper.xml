@@ -2,30 +2,63 @@
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 	<mapper namespace="com.example.trip_maker_server.mapper.UserMapper"> 
-
-	<select id="selectUserByEmail" resultType="com.example.trip_maker_server.domain.User">
+	<select id="selectUserById" parameterType="int" resultType="com.example.trip_maker_server.domain.User">
         SELECT 
             USER_ID, EMAIL, PASSWORD, NICKNAME, 
-            PROFILE_IMAGE_URL, REG_DATE, UPDATE_DATE
+            PROFILE_IMAGE_URL, TRAVEL_STYLES, 
+            REG_DATE, UPDATE_DATE
+        FROM 
+            T_USER_INFO
+        WHERE 
+            USER_ID = #{userId}
+    </select>
+    
+    <select id="selectUserByEmail" parameterType="string" resultType="com.example.trip_maker_server.domain.User">
+        SELECT 
+            USER_ID, EMAIL, PASSWORD, NICKNAME, 
+            PROFILE_IMAGE_URL, TRAVEL_STYLES, 
+            REG_DATE, UPDATE_DATE
         FROM 
             T_USER_INFO
         WHERE 
             EMAIL = #{email}
     </select>
 
-    <select id="selectCountByNickname" resultType="int">
-        SELECT COUNT(1) 
+    <select id="selectCountByNickname" parameterType="string" resultType="int">
+        SELECT COUNT(*) 
         FROM T_USER_INFO 
         WHERE NICKNAME = #{nickname}
     </select>
-
-    <insert id="insertUser" parameterType="com.example.trip_maker_server.domain.User" 
+    
+    <insert id="insertUser" parameterType="com.example.trip_maker_server.domain.User"
             useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO T_USER_INFO (
-            EMAIL, PASSWORD, NICKNAME, REG_DATE, UPDATE_DATE
+            EMAIL, PASSWORD, NICKNAME, 
+            REG_DATE, UPDATE_DATE
         ) VALUES (
-            #{email}, #{password}, #{nickname}, NOW(), NOW()
+            #{email}, #{password}, #{nickname}, 
+            NOW(), NOW()
         )
     </insert>
+
+    <update id="updateUserProfileText" parameterType="com.example.trip_maker_server.domain.User">
+        UPDATE T_USER_INFO
+        SET 
+            NICKNAME = #{nickname},
+            PASSWORD = #{password},
+            TRAVEL_STYLES = #{travelStyles},
+            UPDATE_DATE = NOW()
+        WHERE 
+            USER_ID = #{userId}
+    </update>
+
+    <update id="updateUserProfileImage" parameterType="com.example.trip_maker_server.domain.User">
+        UPDATE T_USER_INFO
+        SET 
+            PROFILE_IMAGE_URL = #{profileImageUrl},
+            UPDATE_DATE = NOW()
+        WHERE 
+            USER_ID = #{userId}
+    </update>
 
 </mapper>

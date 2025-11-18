@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.TourMapper">
+
+    <select id="selectAllTours" resultType="com.example.trip_maker_server.vo.TourProductVO">
+        SELECT 
+            TOUR_ID,
+            TITLE,
+            LOCATION_TAG,
+            PRICE,
+            THUMBNAIL_URL
+        FROM 
+            T_TOUR_PRODUCT
+        ORDER BY 
+            TOUR_ID DESC
+    </select>
+
+	<select id="selectTourById" parameterType="int" resultType="com.example.trip_maker_server.vo.TourProductVO">
+        SELECT 
+            TOUR_ID,
+            TITLE,
+            DESCRIPTION,
+            GUIDE_INFO,  LOCATION_TAG,
+            TOUR_CATEGORY,
+            PRICE,
+            THUMBNAIL_URL
+        FROM 
+            T_TOUR_PRODUCT
+        WHERE 
+            TOUR_ID = #{tourId}
+    </select>
+    
+    <select id="selectTours" parameterType="com.example.trip_maker_server.vo.TourSearchDTO" resultType="com.example.trip_maker_server.vo.TourProductVO">
+        SELECT 
+            TOUR_ID,
+            TITLE,
+            LOCATION_TAG,
+            PRICE,
+            THUMBNAIL_URL,
+            TOUR_CATEGORY
+        FROM 
+            T_TOUR_PRODUCT
+        <where>
+            <if test="location != null and location != ''">
+                AND (LOCATION_TAG LIKE CONCAT('%', #{location}, '%') 
+                     OR TITLE LIKE CONCAT('%', #{location}, '%'))
+            </if>
+
+            <if test="category != null and category != ''">
+                AND TOUR_CATEGORY = #{category}
+            </if>
+
+            <if test="priceRange == 'low'">
+                AND PRICE &lt;= 30000
+            </if>
+            <if test="priceRange == 'mid'">
+                AND PRICE &gt; 30000 AND PRICE &lt;= 100000
+            </if>
+            <if test="priceRange == 'high'">
+                AND PRICE &gt; 100000
+            </if>
+        </where>
+        ORDER BY TOUR_ID DESC
+    </select>
+</mapper>

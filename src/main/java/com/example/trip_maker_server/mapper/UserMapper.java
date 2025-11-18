@@ -7,13 +7,18 @@ import java.util.Optional;
 @Mapper
 public interface UserMapper {
 
-    // (수정된 이름) 이메일로 사용자 찾기 (비밀번호 검증용)
-    Optional<User> selectUserByEmail(String email);
-
-    // (수정된 이름) 닉네임 중복 검사
-    int selectCountByNickname(String nickname);
-
-    // (수정된 이름) 사용자 정보 저장
-    void insertUser(User user);
+    // (★) 1. 텍스트 정보(닉네임, 비번, 스타일)만 수정
+    void updateUserProfileText(User user);
     
+    // (★) 2. 이미지 URL만 수정
+    void updateUserProfileImage(User user);
+
+    // (★) 3. (삭제) 버그가 있던 기존 updateUser는 삭제
+    // void updateUser(User user); 
+
+    // (기존)
+    Optional<User> selectUserById(Integer userId);
+    Optional<User> selectUserByEmail(String email);
+    int selectCountByNickname(String nickname);
+    void insertUser(User user);
 }
