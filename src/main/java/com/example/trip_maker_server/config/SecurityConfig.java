@@ -57,6 +57,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.GET, "/api/tours/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/tours/*").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/companions/**").permitAll()
+                    .requestMatchers("/ws-stomp/**").permitAll()
 
                     // (B) '로그인한 사용자'만 접근 가능
                     .requestMatchers(HttpMethod.POST, "/api/schedules").authenticated() 
@@ -83,23 +84,24 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        
-        // (★) React 앱의 Origin (http://localhost:3000)
-        config.setAllowedOrigins(List.of("http://localhost:3000")); 
-        
-        // (★) 허용할 HTTP 메소드 (GET, POST 등)
+
+        // (★수정함) 기존: "http://localhost:3000" 만 허용
+        // (★변경) 개발용 치트키: 모든 출처(*) 허용 패턴 사용
+        // ngrok 주소가 매번 바뀌어도 신경 쓸 필요가 없어집니다.
+        config.setAllowedOriginPatterns(List.of("*"));
+
+        // 허용할 메서드
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        
-        // (★) 허용할 HTTP 헤더 (모든 헤더 허용)
+
+        // 허용할 헤더
         config.setAllowedHeaders(List.of("*"));
-        
-        // (★) 자격 증명(쿠키 등) 허용
-        config.setAllowCredentials(true); 
+
+        // 자격 증명 허용
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // (★) 모든 경로(/**)에 대해 위 설정 적용
-        source.registerCorsConfiguration("/**", config); 
-        
+        source.registerCorsConfiguration("/**", config);
+
         return source;
     }
 }

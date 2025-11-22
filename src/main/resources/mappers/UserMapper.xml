@@ -33,10 +33,10 @@
     <insert id="insertUser" parameterType="com.example.trip_maker_server.domain.User"
             useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO T_USER_INFO (
-            EMAIL, PASSWORD, NICKNAME, 
+            EMAIL, PASSWORD, NICKNAME, PROFILE_IMAGE_URL,
             REG_DATE, UPDATE_DATE
         ) VALUES (
-            #{email}, #{password}, #{nickname}, 
+            #{email}, #{password}, #{nickname}, '/uploads/dbefc55d-2ebd-4545-9216-8da050624ef0.png',
             NOW(), NOW()
         )
     </insert>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.ChatMapper">
+
+    <select id="findRoomIdByUsers" resultType="Integer">
+        SELECT ROOM_ID FROM T_CHAT_ROOM
+        WHERE (USER_A_ID = #{userA} AND USER_B_ID = #{userB})
+           OR (USER_A_ID = #{userB} AND USER_B_ID = #{userA})
+        LIMIT 1
+    </select>
+    
+    <insert id="insertChatRoom">
+    INSERT INTO T_CHAT_ROOM (USER_A_ID, USER_B_ID)
+	    VALUES (#{userA}, #{userB})
+	</insert>
+	
+	<update id="updateReadStatus">
+        UPDATE T_CHAT_MESSAGE
+        SET IS_READ = TRUE
+        WHERE ROOM_ID = #{roomId} 
+          AND SENDER_ID != #{myUserId} -- 상대방이 보낸 것만 읽음 처리
+    </update>
+    
+    <select id="countTotalUnreadMessages" resultType="int">
+        SELECT COUNT(*) 
+        FROM T_CHAT_MESSAGE M
+        JOIN T_CHAT_ROOM R ON M.ROOM_ID = R.ROOM_ID
+        WHERE (R.USER_A_ID = #{userId} OR R.USER_B_ID = #{userId}) -- 내가 속한 방
+          AND M.SENDER_ID != #{userId} -- 내가 보낸 게 아니고
+          AND M.IS_READ = FALSE        -- 안 읽은 것
+    </select>
+
+	<select id="selectMyChatRooms" resultType="com.example.trip_maker_server.vo.ChatRoomVO">
+        SELECT 
+            R.ROOM_ID,
+            CASE 
+                WHEN R.USER_A_ID = #{myUserId} THEN R.USER_B_ID
+                ELSE R.USER_A_ID 
+            END AS PARTNER_ID,
+            U.NICKNAME AS PARTNER_NICKNAME,
+            U.PROFILE_IMAGE_URL AS PARTNER_PROFILE_IMAGE,
+            
+            -- 마지막 메시지 내용
+            (SELECT CONTENT FROM T_CHAT_MESSAGE M WHERE M.ROOM_ID = R.ROOM_ID ORDER BY MESSAGE_ID DESC LIMIT 1) AS LAST_MESSAGE,
+            
+            -- 마지막 메시지 시간 (이걸로 정렬)
+            (SELECT SEND_TIME FROM T_CHAT_MESSAGE M WHERE M.ROOM_ID = R.ROOM_ID ORDER BY MESSAGE_ID DESC LIMIT 1) AS LAST_MESSAGE_TIME,
+            
+            -- (★신규★) 안 읽은 메시지 개수 (보낸 사람이 내가 아니고, IS_READ가 0인 것)
+            (SELECT COUNT(*) FROM T_CHAT_MESSAGE M 
+             WHERE M.ROOM_ID = R.ROOM_ID 
+               AND M.SENDER_ID != #{myUserId} 
+               AND M.IS_READ = FALSE) AS UNREAD_COUNT
+
+        FROM T_CHAT_ROOM R
+        JOIN T_USER_INFO U ON U.USER_ID = (CASE WHEN R.USER_A_ID = #{myUserId} THEN R.USER_B_ID ELSE R.USER_A_ID END)
+        WHERE R.USER_A_ID = #{myUserId} OR R.USER_B_ID = #{myUserId}
+        
+        -- (★중요★) 최신 메시지 시간 순서로 정렬 (NULL이면 방 생성일 기준)
+        ORDER BY IFNULL(LAST_MESSAGE_TIME, R.REG_DATE) DESC
+    </select>
+
+    <insert id="insertMessage" parameterType="com.example.trip_maker_server.vo.ChatMessageVO" useGeneratedKeys="true" keyProperty="messageId">
+        INSERT INTO T_CHAT_MESSAGE (ROOM_ID, SENDER_ID, CONTENT)
+        VALUES (#{roomId}, #{senderId}, #{content})
+    </insert>
+
+    <select id="selectMessagesByRoomId" resultType="com.example.trip_maker_server.vo.ChatMessageVO">
+        SELECT 
+            MESSAGE_ID, ROOM_ID, SENDER_ID, CONTENT, SEND_TIME
+        FROM 
+            T_CHAT_MESSAGE
+        WHERE 
+            ROOM_ID = #{roomId}
+        ORDER BY 
+            MESSAGE_ID ASC
+    </select>
+
+</mapper>
