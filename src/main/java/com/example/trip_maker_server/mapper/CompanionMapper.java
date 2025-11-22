@@ -16,4 +16,6 @@ public interface CompanionMapper {
 	void deletePost(Integer postId);
 	
 	List<CompanionPostVO> selectAllPosts(CompanionSearchDTO searchDTO);
+	List<CompanionPostVO> selectRecentPosts(Integer limit);
+	List<CompanionPostVO> selectPostsByUserId(Integer userId);
 }

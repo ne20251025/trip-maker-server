@@ -44,4 +44,9 @@ public class TourController {
             return ResponseEntity.internalServerError().body("투어 상세 조회 중 오류 발생");
         }
     }
+    
+    @GetMapping("/recent")
+    public ResponseEntity<?> getRecentTours() {
+        return ResponseEntity.ok(tourService.getRecentTours(4));
+    }
 }

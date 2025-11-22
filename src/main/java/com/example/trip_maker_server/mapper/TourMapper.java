@@ -11,5 +11,7 @@ public interface TourMapper {
     
 	List<TourProductVO> selectTours(TourSearchDTO searchDTO);
     
-    TourProductVO selectTourById(Integer tourId);
+	TourProductVO selectTourById(Integer tourId);
+    
+	List<TourProductVO> selectRecentTours(Integer limit);
 }

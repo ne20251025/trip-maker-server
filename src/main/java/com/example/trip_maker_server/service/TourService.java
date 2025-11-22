@@ -21,4 +21,8 @@ public class TourService {
     public TourProductVO getTourDetail(Integer tourId) {
         return tourMapper.selectTourById(tourId);
     }
+
+	public List<TourProductVO> getRecentTours(int i) {
+		return tourMapper.selectRecentTours(i);
+	}
 }

@@ -5,6 +5,8 @@ import com.example.trip_maker_server.vo.CompanionPostVO;
 import com.example.trip_maker_server.vo.CompanionSearchDTO;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,4 +47,10 @@ public class CompanionService {
         // 2. 삭제
         companionMapper.deletePost(postId);
     }
+	public List<CompanionPostVO> getRecentPosts(int i) {
+        return companionMapper.selectRecentPosts(4);
+	}
+	public List<CompanionPostVO> getMyPosts(Integer userId) {
+		return companionMapper.selectPostsByUserId(userId);
+	}
 }

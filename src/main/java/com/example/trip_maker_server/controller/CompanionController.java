@@ -65,6 +65,20 @@ public class CompanionController {
         }
     }
     
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyPosts(Authentication auth) {
+        Integer userId = Integer.parseInt(((UserDetails) auth.getPrincipal()).getUsername());
+        // (서비스에 메소드 추가 필요: companionMapper.selectPostsByUserId(userId))
+        // 여기서는 서비스 메소드가 있다고 가정합니다.
+        return ResponseEntity.ok(companionService.getMyPosts(userId));
+    }
+    
+    @GetMapping("/recent")
+    public ResponseEntity<?> getRecentCompanions() {
+        // Service에서 mapper.selectRecentPosts(4) 호출하도록 연결해주세요
+        return ResponseEntity.ok(companionService.getRecentPosts(4));
+    }
+    
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable("postId") Integer postId, Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

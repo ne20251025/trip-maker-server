@@ -71,6 +71,20 @@
         LEFT JOIN T_SCHEDULE_INFO S ON P.SCHEDULE_ID = S.SCHEDULE_ID
         WHERE P.POST_ID = #{postId}
     </select>
+    
+    <select id="selectPostsByUserId" resultType="com.example.trip_maker_server.vo.CompanionPostVO">
+	    SELECT * FROM T_COMPANION_POST WHERE USER_ID = #{userId} ORDER BY POST_ID DESC
+	</select>
+    
+    <select id="selectRecentPosts" resultType="com.example.trip_maker_server.vo.CompanionPostVO">
+        SELECT 
+            P.POST_ID, P.TITLE, P.STATUS, P.REG_DATE,
+            U.NICKNAME
+        FROM T_COMPANION_POST P
+        LEFT JOIN T_USER_INFO U ON P.USER_ID = U.USER_ID
+        ORDER BY P.POST_ID DESC
+        LIMIT #{limit}
+    </select>
 
     <delete id="deletePost" parameterType="int">
         DELETE FROM T_COMPANION_POST WHERE POST_ID = #{postId}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.trip_maker_server.mapper.ReservationMapper">
+    
+    <insert id="insertReservation" parameterType="com.example.trip_maker_server.vo.ReservationVO">
+        INSERT INTO T_RESERVATION (USER_ID, TOUR_ID, PERSON_COUNT, TOTAL_PRICE, RESERVATION_DATE)
+        VALUES (#{userId}, #{tourId}, #{personCount}, #{totalPrice}, #{reservationDate})
+    </insert>
+
+    <select id="selectMyReservations" resultType="com.example.trip_maker_server.vo.ReservationVO">
+        SELECT R.*, T.TITLE AS TOUR_TITLE, T.THUMBNAIL_URL AS TOUR_THUMBNAIL
+        FROM T_RESERVATION R
+        JOIN T_TOUR_PRODUCT T ON R.TOUR_ID = T.TOUR_ID
+        WHERE R.USER_ID = #{userId}
+        ORDER BY R.RESERVATION_ID DESC
+    </select>
+</mapper>

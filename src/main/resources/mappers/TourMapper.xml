@@ -62,4 +62,11 @@
         </where>
         ORDER BY TOUR_ID DESC
     </select>
+    
+    <select id="selectRecentTours" resultType="com.example.trip_maker_server.vo.TourProductVO">
+        SELECT * FROM T_TOUR_PRODUCT
+        ORDER BY TOUR_ID DESC
+        LIMIT #{limit}
+    </select>
+    
 </mapper>
